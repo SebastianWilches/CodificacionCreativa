@@ -1,0 +1,10 @@
+.contenedor{
+    margin: auto;
+    display: flex;
+    justify-content: center;
+
+}
+canvas {
+    /* width: 400px;
+    height: 400px; */
+}

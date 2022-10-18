@@ -1,19 +1,29 @@
 const canvasSketch = require('canvas-sketch');
 const random = require('canvas-sketch-util/random');
 const math = require('canvas-sketch-util/math');
+const Tweakpane = require('tweakpane');
 
 const settings = {
   dimensions: [1080, 1080],
   animate: true,
 };
 
+const PARAMS = {
+  Filas: 10,
+  Columnas: 10,
+  Frecuencia: 0.001,
+  Amplitud: 0.2,
+  minAnchoLinea: 1,
+  maxAnchoLinea: 20,
+}
+
 const sketch = () => {
   return ({ context, width, height, frame }) => {
     context.fillStyle = 'white';
     context.fillRect(0, 0, width, height);
 
-    const filas = 10;
-    const columnas = 10;
+    const filas = PARAMS.Filas;
+    const columnas = PARAMS.Columnas;
 
     const gridWidth = width * 0.8;
     const gridHeight = height * 0.8;
@@ -32,12 +42,12 @@ const sketch = () => {
         let casillaPosY = casillaTamañoY * j;
 
         //Ruido
-        const frecuencia = 0.001
-        const amplitud = 0.2
-        const n = random.noise2D(casillaPosX + frame*10, casillaPosY, frecuencia, 1);
-        const angulo = n * Math.PI*0.2;
-        const anchoLinea = math.mapRange(n, -1, 1, 1, 20);
-        
+        const frecuencia = PARAMS.Frecuencia;
+        const amplitud = PARAMS.Amplitud;
+        const n = random.noise2D(casillaPosX + frame * 10, casillaPosY, frecuencia);
+        const angulo = n * Math.PI * amplitud;
+        const anchoLinea = math.mapRange(n, -1, 1, PARAMS.minAnchoLinea, PARAMS.maxAnchoLinea);
+
 
 
         context.lineWidth = anchoLinea;
@@ -62,5 +72,29 @@ const sketch = () => {
 
   };
 };
+
+const crearPane = () => {
+  const pane = new Tweakpane.Pane();
+
+  let folderGrid, folderRuido;
+
+  folderGrid = pane.addFolder({
+    title: 'Parametros Grid'
+  });
+  folderGrid.addInput(PARAMS, 'Filas', { min: 1, max: 100, step: 1 });
+  folderGrid.addInput(PARAMS, 'Columnas', { min: 1, max: 100, step: 1 });
+  folderGrid.addInput(PARAMS, 'minAnchoLinea', { min: 1, max: 100});
+  folderGrid.addInput(PARAMS, 'maxAnchoLinea', { min: 1, max: 100});
+  
+  folderRuido = pane.addFolder({
+    title: 'Parametros Ruido'
+  });
+  folderRuido.addInput(PARAMS, 'Frecuencia', { min: -0.001, max: 0.001});
+  folderRuido.addInput(PARAMS, 'Amplitud', { min: 0, max: 1});
+  
+
+}
+crearPane();
+
 
 canvasSketch(sketch, settings);

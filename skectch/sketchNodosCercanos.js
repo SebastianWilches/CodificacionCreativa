@@ -7,23 +7,18 @@ const settings = {
   animate: true,
 };
 
-// const animate = () => {
-//   console.log('ACTUALIZO');
-//   requestAnimationFrame(animate); //Aqui le pasamos la función que queremos que llame cada vez que el navegador pueda
-// }
-// animate();
 
 const sketch = ({ context, width, height }) => {
   const arrayAgentes = [];
 
   //Creación random de un conjunto de agentes (Puntos)
-  const numAgentes = 40;
+  const numAgentes = 20;
   for (let i = 0; i < numAgentes; i++) {
     arrayAgentes.push(new Agente(random.range(1, width), random.range(1, height), random.range(-1, 1), random.range(-1, 1)));
   }
 
 
-  return ({ context, width, height }) => { //Esta función es la que llama con el animate:true
+  return ({ context, width, height }) => {
     context.fillStyle = 'white';
     context.fillRect(0, 0, width, height);
 
@@ -31,9 +26,14 @@ const sketch = ({ context, width, height }) => {
     //Lineas entre nodos
     for (let i = 0; i < arrayAgentes.length; i++) {
       const agente = arrayAgentes[i];
-
-      for (let j = i+1; j < arrayAgentes.length; j++) {   //El iterar desde aqui, reduce las operaciones casi a la mitad  
+      
+      for (let j = i+1; j < arrayAgentes.length; j++) {
         const otrosAgentes = arrayAgentes[j];
+
+        //Si la distancia entre nodos es mayor a X, no grafique nada
+        let distanciaAgente = agente.getDistancia(otrosAgentes);
+        if (distanciaAgente > 200) continue;
+        
 
         context.lineWidth = 0.5;
         context.beginPath();
@@ -108,5 +108,12 @@ class Agente {
     context.restore();
   }
 
+  getDistancia(agente){
+    const distanciaX = this.posicion.x - agente.posicion.x;
+    const distanciaY = this.posicion.y - agente.posicion.y;
+
+    //Teorema de pitagoras
+    return Math.sqrt(Math.pow(distanciaX,2) + Math.pow(distanciaY,2))
+  }
 
 }

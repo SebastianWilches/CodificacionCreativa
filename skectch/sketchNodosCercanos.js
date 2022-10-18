@@ -35,7 +35,10 @@ const sketch = ({ context, width, height }) => {
         if (distanciaAgente > 200) continue;
         
 
-        context.lineWidth = 0.5;
+        //Ancho de linea entre nodo según distancia
+        context.lineWidth = math.mapRange(distanciaAgente, 0, 200, 6, 0.5);
+
+        // context.lineWidth = 0.5;
         context.beginPath();
         context.moveTo(agente.posicion.x, agente.posicion.y);
         context.lineTo(otrosAgentes.posicion.x, otrosAgentes.posicion.y);

@@ -3,11 +3,6 @@ const random = require('canvas-sketch-util/random');
 const math = require('canvas-sketch-util/math');
 const Tweakpane = require('tweakpane');
 
-const settings = {
-  dimensions: [1080, 1080],
-  animate: true,
-};
-
 const PARAMS = {
   Filas: 10,
   Columnas: 10,
@@ -15,7 +10,17 @@ const PARAMS = {
   Amplitud: 0.2,
   minAnchoLinea: 1,
   maxAnchoLinea: 20,
+  Animacion: true,
+  Frame: 0,
+  tipoLinea: 'butt',
 }
+
+const settings = {
+  dimensions: [1080, 1080],
+  animate: true,
+};
+
+
 
 const sketch = () => {
   return ({ context, width, height, frame }) => {
@@ -44,13 +49,18 @@ const sketch = () => {
         //Ruido
         const frecuencia = PARAMS.Frecuencia;
         const amplitud = PARAMS.Amplitud;
-        const n = random.noise2D(casillaPosX + frame * 10, casillaPosY, frecuencia);
+        // const n = random.noise2D(casillaPosX + frame * 10, casillaPosY, frecuencia);
+
+        const frameParams = PARAMS.Animacion ? frame : PARAMS.Frame //Si la animación esta activa, usara el frame del canvas, si es falso, usara el frame estatico del TweakPane
+
+        const n = random.noise3D(casillaPosX, casillaPosY, frameParams * 10,frecuencia);
         const angulo = n * Math.PI * amplitud;
         const anchoLinea = math.mapRange(n, -1, 1, PARAMS.minAnchoLinea, PARAMS.maxAnchoLinea);
 
 
 
         context.lineWidth = anchoLinea;
+        context.lineCap = PARAMS.tipoLinea;
         context.save();
 
         context.beginPath();
@@ -76,10 +86,10 @@ const sketch = () => {
 const crearPane = () => {
   const pane = new Tweakpane.Pane();
 
-  let folderGrid, folderRuido;
+  let folderGrid, folderRuido, folderAnimacion;
 
   folderGrid = pane.addFolder({
-    title: 'Parametros Grid'
+    title: 'Parámetros Grid'
   });
   folderGrid.addInput(PARAMS, 'Filas', { min: 1, max: 100, step: 1 });
   folderGrid.addInput(PARAMS, 'Columnas', { min: 1, max: 100, step: 1 });
@@ -87,11 +97,17 @@ const crearPane = () => {
   folderGrid.addInput(PARAMS, 'maxAnchoLinea', { min: 1, max: 100});
   
   folderRuido = pane.addFolder({
-    title: 'Parametros Ruido'
+    title: 'Parámetros Ruido'
   });
   folderRuido.addInput(PARAMS, 'Frecuencia', { min: -0.001, max: 0.001});
   folderRuido.addInput(PARAMS, 'Amplitud', { min: 0, max: 1});
   
+  folderAnimacion = pane.addFolder({
+    title: 'Parámetros Animación'
+  })
+  folderAnimacion.addInput(PARAMS, 'Animacion');
+  folderAnimacion.addInput(PARAMS, 'Frame', { min: 0, max: 999});
+  folderAnimacion.addInput(PARAMS, 'tipoLinea', {options: {butt:'butt', round:'round', square:'square'}})
 
 }
 crearPane();

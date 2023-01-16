@@ -5,7 +5,8 @@ const settings = {
 };
 
 //Variables globales
-const texto = 'Ø';
+let manager;
+let texto = 'Ø';
 const fontFamily = 'Arial';
 const fontSize = 1000;
 
@@ -48,4 +49,18 @@ const sketch = () => {
 
 };
 
-canvasSketch(sketch, settings);
+const start = async () => {
+  manager = await canvasSketch(sketch, settings);  
+}
+start();
+
+//Eventos teclado
+document.addEventListener("keyup", (event) => {
+  console.log(event);
+  texto = event.key;
+  manager.render();
+});
+
+
+
+
